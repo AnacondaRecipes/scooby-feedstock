@@ -1,42 +1,67 @@
 {% set name = "scooby" %}
-{% set version = "0.7.1" %}
+{% set version = "0.12.1" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 52014f4681bcc3295932e0f3d94b69e40e6195a6965b34e68941312ce6b636de
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: c4e403160b809c57bbb457d11d6cd31bd2ac8c40929febe2ac08ac865e251fb3
 
 build:
   number: 0
-  noarch: python
-  script: {{ PYTHON }} -m pip install . --no-deps -vv
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
+  skip: true  # [py<310]
   entry_points:
     - scooby=scooby.__main__:main
 
 requirements:
   host:
-    - python >=3.6
+    - python
     - pip
-    - setuptools_scm
+    - setuptools >=77.0.3
+    - setuptools-scm >=8
   run:
-    - python >=3.6
+    - python
+  run_constrained:
+    # pyproject.toml [project.optional-dependencies] cpu extra
+    - mkl  # [not osx]
+    - psutil
 
 test:
+  requires:
+    - pip
+    - pytest
+    - pytest-console-scripts
+    # pyproject.toml [dependency-groups] test
+    - beautifulsoup4
+    - numpy
+    - psutil
+    - scipy
+    - mkl  # [not (osx and arm64)]
+  source_files:
+    - scooby
+    - tests
   imports:
     - scooby
+  commands:
+    - pip check
+    # test_get_version/test_tracking need the PyPI-only `no-version` package;
+    # test_import_os_error expects pyvips installed without libvips (pyvips is not on defaults);
+    # test_inheritence_example needs mkl, which is not available on osx-arm64.
+    - pytest -vv --deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error --deselect tests/test_scooby.py::test_inheritence_example  # [osx and arm64]
+    - pytest -vv --deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error  # [not (osx and arm64)]
 
 about:
-  home: https://github.com/banesullivan/scooby/
+  home: https://github.com/banesullivan/scooby
   license: MIT
   license_family: MIT
   license_file: LICENSE
   summary: A lightweight toolset to easily report your Python environment's package versions and hardware resources.
   description: |
     Scooby has HTML formatting for Jupyter notebooks and rich text formatting for just about every other environment. We designed this module to be lightweight such that it could easily be added as a dependency to Python projects for environment reporting when debugging. Simply add scooby to your dependencies and implement a function to have scooby report on the aspects of the environment you care most about.
-  doc_url: https://github.com/banesullivan/scooby/blob/master/README.md
+  doc_url: https://github.com/banesullivan/scooby/blob/main/README.md
   dev_url: https://github.com/banesullivan/scooby
 
 extra:
