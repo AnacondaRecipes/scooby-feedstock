@@ -24,10 +24,6 @@ requirements:
     - setuptools-scm >=8
   run:
     - python
-  run_constrained:
-    # pyproject.toml [project.optional-dependencies] cpu extra
-    - mkl  # [not osx]
-    - psutil
 
 # test_get_version/test_tracking need the PyPI-only `no-version` package;
 # test_import_os_error expects pyvips installed without libvips (pyvips is not on defaults);
