@@ -39,8 +39,8 @@ test:
     - numpy
     - psutil
     - scipy
-    # mkl only ships on these subdirs in defaults
-    - mkl  # [linux64 or osx64 or win64]
+    # mkl only ships for x86_64 on linux/osx/win in defaults
+    - mkl  # [(linux or osx or win) and x86_64]
   source_files:
     - scooby
     - tests
@@ -48,9 +48,9 @@ test:
     - scooby
   commands:
     - pip check
-    # test_inheritence_example needs mkl, which defaults only ships for linux64/osx64/win64
-    - pytest -vv {{ deselect_tests }} --deselect tests/test_scooby.py::test_inheritence_example  # [not (linux64 or osx64 or win64)]
-    - pytest -vv {{ deselect_tests }}  # [linux64 or osx64 or win64]
+    # test_inheritence_example needs mkl, which defaults only ships for x86_64 on linux/osx/win
+    - pytest -vv {{ deselect_tests }} --deselect tests/test_scooby.py::test_inheritence_example  # [not ((linux or osx or win) and x86_64)]
+    - pytest -vv {{ deselect_tests }}  # [(linux or osx or win) and x86_64]
 
 about:
   home: https://github.com/banesullivan/scooby
