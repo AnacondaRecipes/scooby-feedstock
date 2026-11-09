@@ -1,6 +1,11 @@
 {% set name = "scooby" %}
 {% set version = "0.12.1" %}
 
+# test_get_version/test_tracking need the PyPI-only `no-version` package;
+# test_import_os_error expects pyvips installed without libvips (pyvips is not on defaults);
+# test_import_time shells out to GNU `time` and asserts a <0.2s import benchmark (not available/flaky in CI)
+{% set deselect_tests = "--deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error --deselect tests/test_scooby.py::test_import_time" %}
+
 package:
   name: {{ name }}
   version: {{ version }}
@@ -48,12 +53,9 @@ test:
     - scooby
   commands:
     - pip check
-    # test_get_version/test_tracking need the PyPI-only `no-version` package;
-    # test_import_os_error expects pyvips installed without libvips (pyvips is not on defaults);
-    # test_import_time shells out to GNU `time` and asserts a <0.2s import benchmark (not available/flaky in CI);
-    # test_inheritence_example needs mkl, which defaults only ships for linux64/osx64/win64.
-    - pytest -vv --deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error --deselect tests/test_scooby.py::test_import_time --deselect tests/test_scooby.py::test_inheritence_example  # [not (linux64 or osx64 or win64)]
-    - pytest -vv --deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error --deselect tests/test_scooby.py::test_import_time  # [linux64 or osx64 or win64]
+    # test_inheritence_example needs mkl, which defaults only ships for linux64/osx64/win64
+    - pytest -vv {{ deselect_tests }} --deselect tests/test_scooby.py::test_inheritence_example  # [not (linux64 or osx64 or win64)]
+    - pytest -vv {{ deselect_tests }}  # [linux64 or osx64 or win64]
 
 about:
   home: https://github.com/banesullivan/scooby
