@@ -39,7 +39,8 @@ test:
     - numpy
     - psutil
     - scipy
-    - mkl  # [not (osx and arm64)]
+    # mkl only ships on these subdirs in defaults
+    - mkl  # [linux64 or osx64 or win64]
   source_files:
     - scooby
     - tests
@@ -49,9 +50,9 @@ test:
     - pip check
     # test_get_version/test_tracking need the PyPI-only `no-version` package;
     # test_import_os_error expects pyvips installed without libvips (pyvips is not on defaults);
-    # test_inheritence_example needs mkl, which is not available on osx-arm64.
-    - pytest -vv --deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error --deselect tests/test_scooby.py::test_inheritence_example  # [osx and arm64]
-    - pytest -vv --deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error  # [not (osx and arm64)]
+    # test_inheritence_example needs mkl, which defaults only ships for linux64/osx64/win64.
+    - pytest -vv --deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error --deselect tests/test_scooby.py::test_inheritence_example  # [not (linux64 or osx64 or win64)]
+    - pytest -vv --deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error  # [linux64 or osx64 or win64]
 
 about:
   home: https://github.com/banesullivan/scooby
