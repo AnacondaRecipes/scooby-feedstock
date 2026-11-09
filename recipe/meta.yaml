@@ -1,11 +1,6 @@
 {% set name = "scooby" %}
 {% set version = "0.12.1" %}
 
-# test_get_version/test_tracking need the PyPI-only `no-version` package;
-# test_import_os_error expects pyvips installed without libvips (pyvips is not on defaults);
-# test_import_time shells out to GNU `time` and asserts a <0.2s import benchmark (not available/flaky in CI)
-{% set deselect_tests = "--deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error --deselect tests/test_scooby.py::test_import_time" %}
-
 package:
   name: {{ name }}
   version: {{ version }}
@@ -34,6 +29,10 @@ requirements:
     - mkl  # [not osx]
     - psutil
 
+# test_get_version/test_tracking need the PyPI-only `no-version` package;
+# test_import_os_error expects pyvips installed without libvips (pyvips is not on defaults);
+# test_import_time shells out to GNU `time` and asserts a <0.2s import benchmark (not available/flaky in CI)
+{% set deselect_tests = "--deselect tests/test_scooby.py::test_get_version --deselect tests/test_scooby.py::test_tracking --deselect tests/test_scooby.py::test_import_os_error --deselect tests/test_scooby.py::test_import_time" %}
 test:
   requires:
     - pip
